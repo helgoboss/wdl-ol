@@ -1086,6 +1086,9 @@ bool IGraphics::DrawIText(IText* pTxt, char* str, IRECT* pR, bool measure)
     fmt |= DT_CENTER;
   else // if (pTxt->mAlign == IText::kAlignFar)
     fmt |= DT_RIGHT;
+    
+  // Crop text on Windows if too long
+  fmt |= DT_END_ELLIPSIS;
 
   if (measure) 
   {
