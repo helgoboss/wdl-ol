@@ -682,8 +682,8 @@ void IGraphicsMac::PromptForFile(WDL_String* pFilename, EFileAction action, WDL_
 
   pFilename->Set(""); // reset it
 
-  //if (CSTR_NOT_EMPTY(extensions))
-  fileTypes = [[NSString stringWithUTF8String:extensions] componentsSeparatedByString: @" "];
+  if (CSTR_NOT_EMPTY(extensions))
+    fileTypes = [[NSString stringWithUTF8String:extensions] componentsSeparatedByString: @" "];
 
   if (action == kFileSave)
   {
