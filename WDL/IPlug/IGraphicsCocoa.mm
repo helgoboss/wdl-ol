@@ -331,6 +331,9 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
     [self getMouseXY:pEvent x:&x y:&y];
     IMouseMod ms = GetMouseMod(pEvent);
     mGraphics->OnMouseUp(x, y, &ms);
+    
+    // Tooltips could have changed
+    mGraphics->UpdateTooltips();
   }
 }
 
