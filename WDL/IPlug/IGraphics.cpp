@@ -1049,6 +1049,14 @@ int IGraphics::GetLastClickedParamForPTAutomation()
   return idx;
 }
 
+void IGraphics::OnFileDropped(char* path, int x, int y) {
+	int i = GetMouseControlIdx(x, y);
+	IControl* control = GetControl(i);
+	if (control != NULL) {
+		control->OnFileDropped(path);
+	}
+}
+
 void IGraphics::OnGUIIdle()
 {
   int i, n = mControls.GetSize();
@@ -1086,7 +1094,7 @@ bool IGraphics::DrawIText(IText* pTxt, char* str, IRECT* pR, bool measure)
     fmt |= DT_CENTER;
   else // if (pTxt->mAlign == IText::kAlignFar)
     fmt |= DT_RIGHT;
-    
+
   // Crop text on Windows if too long
   fmt |= DT_END_ELLIPSIS;
 

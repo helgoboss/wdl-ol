@@ -53,6 +53,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     int mSec = int(1000.0 / sFPS);
     SetTimer(hWnd, IPLUG_TIMER_ID, mSec, NULL);
     SetFocus(hWnd); // gets scroll wheel working straight away
+	DragAcceptFiles(hWnd, true);
     return 0;
   }
 
@@ -376,6 +377,24 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     {
       return 0;
     }
+	case WM_DROPFILES:
+	{
+						 HDROP hdrop = (HDROP)wParam;
+
+						 // Query path to file
+						 char pathToFile[1025];
+						 DragQueryFile(hdrop, 0, pathToFile, 1024);
+
+						 // Query drop position
+						 POINT point;
+						 DragQueryPoint(hdrop, &point);
+
+						 // Delegate
+						 pGraphics->OnFileDropped(pathToFile, point.x, point.y);
+
+						 // Confirm support
+						 return 0;
+	}
   }
   return DefWindowProc(hWnd, msg, wParam, lParam);
 }
