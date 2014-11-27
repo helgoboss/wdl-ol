@@ -161,7 +161,7 @@ typedef struct
   BOOL MouseOverRect_hasZoomButtons;
 
   UINT uCurrentScrollbar;
-  UINT uCurrentScrollPortion;
+  int uCurrentScrollPortion;
   UINT uMouseOverScrollbar;
   UINT uHitTestPortion;
   UINT uLastHitTestPortion;
@@ -1818,7 +1818,7 @@ static int getPink(int x, int y, int vert, int np=0, int add=1)
   int h = bmp->getHeight();
   int rs=bmp->getRowSpan();
   LICE_pixel *p = bmp->getBits();
-  if(x>=w || y>=h) return 0;
+  if(x < 0 || y < 0 || x>=w || y>=h) return 0;
   p += rs * y + x;
   if(!vert)
   {
@@ -2365,7 +2365,7 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
 //
 static LRESULT LButtonUp(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
-	RECT rect;
+	RECT rect={0,};
 	//UINT thisportion;
 	HDC hdc;
 	POINT pt;

@@ -35,29 +35,14 @@ static LRESULT sendSwellMessage(id obj, UINT uMsg, WPARAM wParam, LPARAM lParam)
   return 0;
 }
 
-static BOOL Is105Plus()
-{
-  static char is105;
-  if (!is105)
-  {
-    SInt32 v=0x1040;
-    Gestalt(gestaltSystemVersion,&v);
-    is105 = v>=0x1050 ? 1 : -1;    
-  }
-  return is105>0;
-}
 
-static BOOL useNoMiddleManCocoa() { return Is105Plus(); }
+extern int SWELL_GetOSXVersion();
+
+static BOOL useNoMiddleManCocoa() { return SWELL_GetOSXVersion() >= 0x1050; }
 
 void updateWindowCollection(NSWindow *w)
 {
-  static SInt32 ver;
-  if (!ver)
-  {
-    Gestalt(gestaltSystemVersion,&ver);
-    if (!ver) ver=0x1040;
-  }
-  if (ver>=0x1060)
+  if (SWELL_GetOSXVersion()>=0x1060)
   {
     const int NSWindowCollectionBehaviorParticipatesInCycle = 1 << 5;
     const int  NSWindowCollectionBehaviorManaged = 1 << 2;
@@ -588,7 +573,12 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
   id sender=[aNotification object];
   int code=EN_CHANGE;
   if ([sender isKindOfClass:[NSComboBox class]]) return;
-  if (m_wndproc&&!m_hashaddestroy) m_wndproc((HWND)self,WM_COMMAND,([(NSControl*)sender tag])|(code<<16),(LPARAM)sender);
+  if (m_wndproc&&!m_hashaddestroy)
+  {
+    m_wndproc((HWND)self,WM_COMMAND,([(NSControl*)sender tag])|(code<<16),(LPARAM)sender);
+    code=EN_KILLFOCUS;
+    m_wndproc((HWND)self,WM_COMMAND,([(NSControl*)sender tag])|(code<<16),(LPARAM)sender);
+  }
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
@@ -597,6 +587,13 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
   int code=EN_CHANGE;
   if ([sender isKindOfClass:[NSComboBox class]]) code=CBN_EDITCHANGE;
   if (m_wndproc&&!m_hashaddestroy) m_wndproc((HWND)self,WM_COMMAND,([(NSControl*)sender tag])|(code<<16),(LPARAM)sender);
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification
+{
+  id sender=[aNotification object];
+  int code=EN_KILLFOCUS;
+  if (m_wndproc && !m_hashaddestroy) m_wndproc((HWND)self,WM_COMMAND,([(NSControl*)sender tag])|(code<<16),(LPARAM)sender);
 }
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
@@ -616,7 +613,7 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
     else
     {
       SWELL_ListView* v = (SWELL_ListView*)sender;
-      NMLISTVIEW nmlv={{(HWND)sender,[(NSControl*)sender tag], NM_DBLCLK}, [v clickedRow], [sender clickedColumn], };
+      NMLISTVIEW nmlv={{(HWND)sender,(UINT_PTR)[(NSControl*)sender tag], NM_DBLCLK}, (int) [v clickedRow], (int) [sender clickedColumn], };
       SWELL_ListView_Row *row=v->m_items->Get(nmlv.iItem);
       if (row)
        nmlv.lParam = row->m_param;
@@ -625,7 +622,7 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
   }
   else
   {   
-    NMCLICK nm={{(HWND)sender,[(NSControl*)sender tag],NM_DBLCLK}, }; 
+    NMCLICK nm={{(HWND)sender,(UINT_PTR)[(NSControl*)sender tag],NM_DBLCLK}, };
     m_wndproc((HWND)self,WM_NOTIFY,[(NSControl*)sender tag],(LPARAM)&nm);
   }
 }
@@ -633,7 +630,7 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
   NSOutlineView *sender=[notification object];
-  NMTREEVIEW nmhdr={{(HWND)sender,(int)[sender tag],TVN_SELCHANGED},0,};  // todo: better treeview notifications
+  NMTREEVIEW nmhdr={{(HWND)sender,(UINT_PTR)[sender tag],TVN_SELCHANGED},0,};  // todo: better treeview notifications
   if (m_wndproc&&!m_hashaddestroy) m_wndproc((HWND)self,WM_NOTIFY,(int)[sender tag],(LPARAM)&nmhdr);
 }
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
@@ -645,7 +642,7 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
       }
       else
       {
-        NMLISTVIEW nmhdr={{(HWND)sender,(int)[sender tag],LVN_ITEMCHANGED},(int)[sender selectedRow],0}; 
+        NMLISTVIEW nmhdr={{(HWND)sender,(UINT_PTR)[sender tag],LVN_ITEMCHANGED},(int)[sender selectedRow],0};
         if (m_wndproc&&!m_hashaddestroy) m_wndproc((HWND)self,WM_NOTIFY,(int)[sender tag],(LPARAM)&nmhdr);
         
       }
@@ -661,7 +658,7 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
   {
     int col=((SWELL_ListView *)tableView)->m_cols->Find(tableColumn);
 
-    NMLISTVIEW hdr={{(HWND)tableView,[tableView tag],LVN_COLUMNCLICK},-1,col};
+    NMLISTVIEW hdr={{(HWND)tableView,(UINT_PTR)[tableView tag],LVN_COLUMNCLICK},-1,col};
     if (m_wndproc&&!m_hashaddestroy) m_wndproc((HWND)self,WM_NOTIFY,[tableView tag], (LPARAM) &hdr);
   }
 }
@@ -1200,6 +1197,7 @@ static int DelegateMouseMove(NSView *view, NSEvent *theEvent)
 - (void)scrollWheel:(NSEvent *)theEvent
 {
   if (!m_enabled) return;
+  // todo: use scrollingDeltaX/scrollingDeltaY etc on 10.7+ ?
   if ([theEvent deltaY] != 0.0f)
   {
     SWELL_SendMouseMessage(self,WM_MOUSEWHEEL,theEvent);
@@ -2735,7 +2733,7 @@ HWND SWELL_CreateCarbonWindowView(HWND viewpar, void **wref, RECT* r, bool wantc
   ClientToScreen(viewpar, (POINT*)&wndr);
   ClientToScreen(viewpar, (POINT*)&wndr+1);
   //Rect r2 = { wndr.top, wndr.left, wndr.bottom, wndr.right };
-  Rect r2 = { wndr.bottom, wndr.left, wndr.top, wndr.right };
+  Rect r2 = { (short)wndr.bottom, (short)wndr.left, (short)wndr.top, (short)wndr.right };
   SWELL_hwndCarbonHost *w = [[SWELL_hwndCarbonHost alloc] initCarbonChild:(NSView*)viewpar rect:&r2 composit:wantcomp];
   if (w) *wref = [w->m_cwnd windowRef];
   return (HWND)w;
@@ -3013,7 +3011,7 @@ void SWELL_SetViewGL(HWND h, bool wantGL)
             (NSOpenGLPixelFormatAttribute)96/*NSOpenGLPFAAllowOfflineRenderers*/, // allows use of NSSupportsAutomaticGraphicsSwitching and no gpu-forcing
             (NSOpenGLPixelFormatAttribute)0
         }; // todo: optionally add any attributes before the 0
-        if (!Is105Plus()) atr[0]=(NSOpenGLPixelFormatAttribute)0; // 10.4 can't use offline renderers and will fail trying
+        if (SWELL_GetOSXVersion() < 0x1050) atr[0]=(NSOpenGLPixelFormatAttribute)0; // 10.4 can't use offline renderers and will fail trying
 
         NSOpenGLPixelFormat *fmt  = [[NSOpenGLPixelFormat alloc] initWithAttributes:atr];
         
@@ -3042,21 +3040,27 @@ void DrawSwellViewRectImpl(SWELL_hwndChild *view, NSRect rect, HDC hdc)
     return;
   }    
   view->m_paintctx_hdc=hdc;
-  if (view->m_paintctx_hdc && view->m_glctx)
+  if (view->m_paintctx_hdc)
   {
     view->m_paintctx_hdc->GLgfxctx = view->m_glctx;
-    
-    [view->m_glctx setView:view];
-    [view->m_glctx makeCurrentContext];
-    [view->m_glctx update];
+    if (view->m_glctx)
+    {
+      [view->m_glctx setView:view];
+      [view->m_glctx makeCurrentContext];
+      [view->m_glctx update];
+    }
   }
   view->m_paintctx_rect=rect;
   view->m_paintctx_used=false;
   DoPaintStuff(view->m_wndproc,(HWND)view,view->m_paintctx_hdc,&view->m_paintctx_rect);
   
-  if (view->m_paintctx_hdc && view->m_glctx && [NSOpenGLContext currentContext] == view->m_glctx)
+  if (view->m_paintctx_hdc)
   {
-    [NSOpenGLContext clearCurrentContext]; 
+    if (view->m_glctx && [NSOpenGLContext currentContext] == view->m_glctx)
+    {
+      [NSOpenGLContext clearCurrentContext]; 
+    }
+    view->m_paintctx_hdc->GLgfxctx = NULL;
   }
   view->m_paintctx_hdc=0;
   if (!view->m_paintctx_used) {

@@ -163,8 +163,8 @@ typedef unsigned int ULONG;
 typedef short SHORT;
 typedef int *LPINT;
 typedef char CHAR;
-typedef char *LPSTR;
-typedef const char *LPCSTR;
+typedef char *LPSTR, *LPTSTR;
+typedef const char *LPCSTR, *LPCTSTR;
 
 #define __int64 long long // define rather than typedef, for unsigned __int64 support
 
@@ -653,7 +653,7 @@ __attribute__ ((visibility ("default"))) BOOL WINAPI DllMain(HINSTANCE hInstDLL,
 #define GWL_WNDPROC         (-4)
 #define DWL_DLGPROC         (-8)
 
-#define SWELL_NOT_WS_VISIBLE 0x80000000L
+#define SWELL_NOT_WS_VISIBLE ((int)0x80000000)
 #define WS_CHILDWINDOW (WS_CHILD)
 #define WS_CHILD      0x40000000L
 #define WS_DISABLED   0x08000000L
@@ -880,6 +880,8 @@ __attribute__ ((visibility ("default"))) BOOL WINAPI DllMain(HINSTANCE hInstDLL,
 #define MFS_ENABLED MF_ENABLED
 #define MFS_UNCHECKED MF_UNCHECKED
 
+#define EN_SETFOCUS         0x0100
+#define EN_KILLFOCUS        0x0200
 #define EN_CHANGE           0x0300
 #define STN_CLICKED         0
 #define STN_DBLCLK          1

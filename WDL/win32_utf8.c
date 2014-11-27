@@ -1,11 +1,14 @@
+#if defined(_WIN32) && !defined(WDL_WIN32_UTF8_NO_UI_IMPL)
+#include <shlobj.h>
+#include <commctrl.h>
+#endif
+
 #include "win32_utf8.h"
 #include "wdltypes.h"
 
 #ifdef _WIN32
 
 #if !defined(WDL_NO_SUPPORT_UTF8)
-
-#include <commctrl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,23 +102,67 @@ UINT GetDlgItemTextUTF8(HWND hDlg, int nIDDlgItem, LPTSTR lpString, int nMaxCoun
 BOOL SetDlgItemTextUTF8(HWND hDlg, int nIDDlgItem, LPCTSTR lpString)
 {
   HWND h = GetDlgItem(hDlg,nIDDlgItem);
-  if (h) return SetWindowTextUTF8(h,lpString);
-  return FALSE;
+  if (!h) return FALSE;
+
+  if (WDL_HasUTF8(lpString) && GetVersion()< 0x80000000)
+  {
+    MBTOWIDE(wbuf,lpString);
+    if (wbuf_ok)
+    {
+      BOOL rv = SetWindowTextW(h, wbuf);
+      MBTOWIDE_FREE(wbuf);
+      return rv;
+    }
+
+    MBTOWIDE_FREE(wbuf);
+  }
+
+  return SetWindowTextA(h, lpString);
+
+}
+
+static LRESULT WINAPI __forceUnicodeWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+  if (uMsg == WM_SETTEXT && lParam)
+  {
+    MBTOWIDE(wbuf,(const char *)lParam);
+    if (wbuf_ok)
+    {
+      LRESULT rv = DefWindowProcW(hwnd, uMsg, wParam, (LPARAM)wbuf);
+      MBTOWIDE_FREE(wbuf);
+      return rv;
+    }
+    MBTOWIDE_FREE(wbuf);
+  }
+  return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 BOOL SetWindowTextUTF8(HWND hwnd, LPCTSTR str)
 {
   if (WDL_HasUTF8(str) && GetVersion()< 0x80000000)
   {
-    MBTOWIDE(wbuf,str);
-    if (wbuf_ok)
+    DWORD pid;
+    if (GetWindowThreadProcessId(hwnd,&pid) == GetCurrentThreadId() && 
+        pid == GetCurrentProcessId() && 
+        !(GetWindowLong(hwnd,GWL_STYLE)&WS_CHILD))
     {
-      BOOL rv=SetWindowTextW(hwnd,wbuf);
-      MBTOWIDE_FREE(wbuf);
+      LPARAM tmp = SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LPARAM)__forceUnicodeWndProc);
+      BOOL rv = SetWindowTextA(hwnd, str);
+      SetWindowLongPtr(hwnd, GWLP_WNDPROC, tmp);
       return rv;
     }
+    else
+    {
+      MBTOWIDE(wbuf,str);
+      if (wbuf_ok)
+      {
+        BOOL rv = SetWindowTextW(hwnd, wbuf);
+        MBTOWIDE_FREE(wbuf);
+        return rv;
+      }
 
-    MBTOWIDE_FREE(wbuf);
+      MBTOWIDE_FREE(wbuf);
+    }
   }
 
   return SetWindowTextA(hwnd,str);
@@ -232,6 +279,7 @@ WCHAR *WDL_UTF8ToWC(const char *buf, BOOL doublenull, int minsize, DWORD *sizeou
   }
 }
 
+#ifndef WDL_WIN32_UTF8_NO_UI_IMPL
 static BOOL GetOpenSaveFileNameUTF8(LPOPENFILENAME lpofn, BOOL save)
 {
 
@@ -313,6 +361,66 @@ BOOL GetSaveFileNameUTF8(LPOPENFILENAME lpofn)
   return GetSaveFileNameA(lpofn);
 }
 
+BOOL SHGetPathFromIDListUTF8(const struct _ITEMIDLIST *pidl, LPSTR pszPath, int pszPathLen)
+{
+  if (pszPath && GetVersion() < 0x80000000)
+  {
+    const int alloc_sz = pszPathLen < 4096 ? 4096 : pszPathLen;
+    WIDETOMB_ALLOC(wfn,alloc_sz);
+    if (wfn)
+    {
+      BOOL b = FALSE;
+      if (SHGetPathFromIDListW(pidl,wfn))
+      {
+        b = WideCharToMultiByte(CP_UTF8,0,wfn,-1,pszPath,pszPathLen,NULL,NULL) > 0;
+      }
+      WIDETOMB_FREE(wfn);
+      return b;
+    }
+  }
+  return SHGetPathFromIDListA(pidl,pszPath);
+}
+
+struct _ITEMIDLIST *SHBrowseForFolderUTF8(struct _browseinfoA *bi)
+{
+  if (bi && (WDL_HasUTF8(bi->pszDisplayName) || WDL_HasUTF8(bi->lpszTitle)) && GetVersion() < 0x80000000)
+  {
+    MBTOWIDE(wfn,bi->pszDisplayName);
+    if (wfn_ok)
+    {
+      MBTOWIDE(wtxt,bi->lpszTitle);
+      if (wtxt_ok)
+      {
+        BROWSEINFOW biw ={ bi->hwndOwner,bi->pidlRoot,wfn,wtxt,bi->ulFlags,bi->lpfn,(LPARAM)bi->lParam,bi->iImage };
+        LPITEMIDLIST idlist = SHBrowseForFolderW(&biw);
+        MBTOWIDE_FREE(wfn);
+        MBTOWIDE_FREE(wtxt);
+        return (struct _ITEMIDLIST *) idlist;
+      }
+      MBTOWIDE_FREE(wtxt);
+    }
+    MBTOWIDE_FREE(wfn);
+  }
+  return (struct _ITEMIDLIST *)SHBrowseForFolderA(bi);
+}
+
+int WDL_UTF8_SendBFFM_SETSEL(HWND hwnd, const char *str)
+{
+  if (GetVersion()<0x80000000 && WDL_HasUTF8(str))
+  {
+    MBTOWIDE(wc, str);
+    if (wc_ok)
+    {
+      int r=(int)SendMessage(hwnd, BFFM_SETSELECTIONW, 1, (LPARAM)wc);
+      MBTOWIDE_FREE(wc);
+      return r;
+    }
+    MBTOWIDE_FREE(wc);
+  }
+  return (int) SendMessage(hwnd, BFFM_SETSELECTIONA, 1, (LPARAM)str);
+}
+
+#endif
 
 BOOL SetCurrentDirectoryUTF8(LPCTSTR path)
 {
@@ -701,7 +809,7 @@ HINSTANCE ShellExecuteUTF8(HWND hwnd, LPCTSTR lpOp, LPCTSTR lpFile, LPCTSTR lpPa
   return ShellExecuteA(hwnd,lpOp,lpFile,lpParm,lpDir,nShowCmd);
 }
 
-#if defined(WDL_WIN32_UTF8_IMPL_NOTSTATIC) || defined(WDL_WIN32_UTF8_IMPL_STATICHOOKS)
+#if (defined(WDL_WIN32_UTF8_IMPL_NOTSTATIC) || defined(WDL_WIN32_UTF8_IMPL_STATICHOOKS)) && !defined(WDL_WIN32_UTF8_NO_UI_IMPL)
 
 
 #define WDL_UTF8_OLDPROCPROP "WDLUTF8OldProc"

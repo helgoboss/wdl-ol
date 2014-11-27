@@ -282,7 +282,7 @@ static NSCursor* MakeCursorFromData(unsigned char* data, int hotspot_x, int hots
       if (img)
       {
         [img addRepresentation:bmp];  
-        NSPoint hs = { hotspot_x, hotspot_y };
+        NSPoint hs = NSMakePoint(hotspot_x, hotspot_y);
         c = [[NSCursor alloc] initWithImage:img hotSpot:hs];
         [img release];
       }   
@@ -438,9 +438,8 @@ static NSImage *swell_imageFromCursorString(const char *name, POINT *hotSpot)
       static char tempfn[512];
       if (!tempfn[0])
       {
-        const char *p = getenv("TEMP");
-        if  (!p || !*p) p="/tmp";
-        sprintf(tempfn,"%.200s/swellcur%x%x.ico",p,timeGetTime(),(int)getpid());
+        GetTempPath(256,tempfn);
+        snprintf(tempfn+strlen(tempfn),256,"swellcur%x%x.ico", timeGetTime(),(int)getpid());
       }
       
       FILE *outfp = fopen(tempfn,"wb");

@@ -30,19 +30,23 @@ enum EParamEditMsg
 
 #define IPLUG_TIMER_ID 2
 
+inline IMouseMod GetMouseMod(WPARAM wParam)
+{
+  return IMouseMod((wParam & MK_LBUTTON), 
+                   (wParam & MK_RBUTTON),
+                   (wParam & MK_SHIFT), 
+                   (wParam & MK_CONTROL), 
+                   
 #ifdef RTAS_API
-inline IMouseMod GetMouseMod(WPARAM wParam)
-{
-  return IMouseMod((wParam & MK_LBUTTON), (wParam & MK_RBUTTON),
-                   (wParam & MK_SHIFT), (wParam & MK_CONTROL), IsOptionKeyDown());
-}
+                   IsOptionKeyDown()
+#elif defined(AAX_API)
+                   GetAsyncKeyState(VK_MENU) < 0
 #else
-inline IMouseMod GetMouseMod(WPARAM wParam)
-{
-  return IMouseMod((wParam & MK_LBUTTON), (wParam & MK_RBUTTON),
-                   (wParam & MK_SHIFT), (wParam & MK_CONTROL), GetKeyState(VK_MENU) < 0);
-}
+                   GetKeyState(VK_MENU) < 0
 #endif
+                   );
+}
+
 // static
 LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -162,17 +166,8 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       pGraphics->HideTooltip();
       if (pGraphics->mParamEditWnd)
       {
-        SetWindowLongPtr(pGraphics->mParamEditWnd, GWLP_WNDPROC, (LPARAM) pGraphics->mDefEditProc);
-        DestroyWindow(pGraphics->mParamEditWnd);
-        pGraphics->mParamEditWnd = 0;
-        pGraphics->mEdParam = 0;
-        pGraphics->mEdControl = 0;
-        pGraphics->mDefEditProc = 0;
-        pGraphics->mParamEditMsg = kNone;
-        //force full redraw when closing text entry
-        RECT r = { 0, 0, pGraphics->Width(), pGraphics->Height() };
-        InvalidateRect(hWnd, &r, FALSE);
-        UpdateWindow(hWnd);
+        pGraphics->mParamEditMsg = kCommit;
+        return 0;
       }
       SetFocus(hWnd); // Added to get keyboard focus again when user clicks in window
       SetCapture(hWnd);
@@ -325,6 +320,12 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       else
         return 0;
     }
+    case WM_KEYUP:
+    {
+      HWND rootHWnd = GetAncestor(hWnd, GA_ROOT);
+      SendMessage(rootHWnd, msg, wParam, lParam);
+      return DefWindowProc(hWnd, msg, wParam, lParam);
+    }
     case WM_PAINT:
     {
       RECT r;
@@ -402,7 +403,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 // static
 LRESULT CALLBACK IGraphicsWin::ParamEditProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  IGraphicsWin* pGraphics = (IGraphicsWin*) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+  IGraphicsWin* pGraphics = (IGraphicsWin*) GetWindowLongPtr(GetParent(hWnd), GWLP_USERDATA);
 
   if (pGraphics && pGraphics->mParamEditWnd && pGraphics->mParamEditWnd == hWnd)
   {
@@ -991,7 +992,7 @@ void IGraphicsWin::CreateTextEntry(IControl* pControl, IText* pText, IRECT* pTex
   SetFocus(mParamEditWnd);
 
   mDefEditProc = (WNDPROC) SetWindowLongPtr(mParamEditWnd, GWLP_WNDPROC, (LONG_PTR) ParamEditProc);
-  SetWindowLong(mParamEditWnd, GWLP_USERDATA, (LPARAM) this);
+  SetWindowLongPtr(mParamEditWnd, GWLP_USERDATA, 0xdeadf00b);
 
   //DeleteObject(font);
 
