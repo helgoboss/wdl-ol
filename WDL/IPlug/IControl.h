@@ -37,7 +37,7 @@ public:
   virtual void OnMouseOver(int x, int y, IMouseMod* pMod) {}
   virtual void OnMouseOut() {}
 
-  virtual void OnFileDropped(char* path) {};
+  virtual void OnFileDropped(const char* path) {};
 
   // By default, mouse double click has its own handler.  A control can set mDblAsSingleClick to true to change,
   // which maps double click to single click for this control (and also causes the mouse to be

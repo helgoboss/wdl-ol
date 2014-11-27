@@ -1049,7 +1049,7 @@ int IGraphics::GetLastClickedParamForPTAutomation()
   return idx;
 }
 
-void IGraphics::OnFileDropped(char* path, int x, int y) {
+void IGraphics::OnFileDropped(const char* path, int x, int y) {
 	int i = GetMouseControlIdx(x, y);
 	IControl* control = GetControl(i);
 	if (control != NULL) {

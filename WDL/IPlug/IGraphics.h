@@ -191,7 +191,7 @@ public:
   int GetParamIdxForPTAutomation(int x, int y);
   int GetLastClickedParamForPTAutomation();
 
-  void OnFileDropped(char* path, int x, int y);
+  void OnFileDropped(const char* path, int x, int y);
 
 #ifdef AAX_API
   void SetViewContainer(AAX_IViewContainer* viewContainer) { mAAXViewContainer = viewContainer; }
