@@ -236,6 +236,9 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   mTimer = [NSTimer timerWithTimeInterval:sec target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
   [[NSRunLoop currentRunLoop] addTimer: mTimer forMode: (NSString*) kCFRunLoopCommonModes];
 
+  // Add support for file drag'n'drop
+  [self registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+
   return self;
 }
 
@@ -280,6 +283,34 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   {
     [self setNeedsDisplayInRect:ToNSRect(mGraphics, &r)];
   }
+}
+
+
+- (NSDragOperation)draggingEntered: (id <NSDraggingInfo>) sender {
+    NSPasteboard *pboard = [sender draggingPasteboard];
+
+    if ([[pboard types] containsObject:NSFilenamesPboardType]) {
+        return NSDragOperationGeneric;
+    } else {
+        return NSDragOperationNone;
+    }
+}
+
+- (BOOL)performDragOperation: (id<NSDraggingInfo>) sender {
+    NSPasteboard *pboard = [sender draggingPasteboard];
+    
+    if ([[pboard types] containsObject:NSFilenamesPboardType]) {
+        NSArray *files = [pboard propertyListForType:NSFilenamesPboardType];
+        NSString *firstFile = [files firstObject];
+        const char *firstFileCString = [firstFile UTF8String];
+        NSPoint point = [sender draggingLocation];
+        NSPoint relativePoint = [self convertPoint: point fromView:nil];
+        int x = (int) relativePoint.x - 2;
+        int y = mGraphics->Height() - (int) relativePoint.y - 3;
+        mGraphics->OnFileDropped(firstFileCString, x, y);
+    }
+    
+    return YES;
 }
 
 - (void) getMouseXY: (NSEvent*) pEvent x: (int*) pX y: (int*) pY
