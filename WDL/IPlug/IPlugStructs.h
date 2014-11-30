@@ -70,7 +70,7 @@ const IColor DEFAULT_TEXT_ENTRY_FGCOLOR = COLOR_BLACK;
   const char* const DEFAULT_FONT = "Verdana";
   const int DEFAULT_TEXT_SIZE = 12;
 #elif defined OS_OSX
-  const char* const DEFAULT_FONT = "Monaco";
+  const char* const DEFAULT_FONT = "Lucida Grande";
   const int DEFAULT_TEXT_SIZE = 10;
 #endif
 
