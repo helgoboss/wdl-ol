@@ -1086,7 +1086,13 @@ bool IGraphics::DrawIText(IText* pTxt, char* str, IRECT* pR, bool measure)
   LICE_pixel color = LiceColor(&pTxt->mColor);
   font->SetTextColor(color);
 
+#ifdef OS_WIN
   UINT fmt = DT_NOCLIP;
+#else
+  // OS X doesn't have an ellipsis option. So we need another way to prevent
+  // the text from leaving the rectangle.
+  UINT fmt = 0;
+#endif
   if (LICE_GETA(color) < 255) fmt |= LICE_DT_USEFGALPHA;
   if (pTxt->mAlign == IText::kAlignNear)
     fmt |= DT_LEFT;
