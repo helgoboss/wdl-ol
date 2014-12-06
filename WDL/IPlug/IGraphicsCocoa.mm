@@ -465,7 +465,20 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
       [[NSApp mainWindow] makeKeyWindow];
       [NSApp postEvent: [NSApp currentEvent] atStart: YES];
       #else
-      [[self nextResponder] keyDown:pEvent];
+      // Search DAW window (works at least for REAPER)
+      NSWindow* dawWindow = NULL;
+      for (NSWindow* window in [NSApp windows]) {
+        if ([window level] == 0 && [window frame].size.width > 0 && [window frame].size.height > 0) {
+          dawWindow = window;
+          break;
+        }
+      }
+      // Bring focus to DAW window and forward the keyDown evnt to it.
+      // Plugin loses focus then but it seems it can't be avoided on Mac.
+      if (dawWindow != NULL) {
+        [dawWindow makeKeyWindow];
+        [dawWindow postEvent: [NSApp currentEvent] atStart: YES];
+      }
       #endif
     }
   }

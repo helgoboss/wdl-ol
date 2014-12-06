@@ -301,7 +301,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       else if (wParam >= '0' && wParam <= '9') key = KEY_DIGIT_0+wParam-'0';
       else if (wParam >= 'A' && wParam <= 'Z') key = KEY_ALPHA_A+wParam-'A';
       else if (wParam >= 'a' && wParam <= 'z') key = KEY_ALPHA_A+wParam-'a';
-      else handle = false;
+      else key = false;
 
       if (handle)
       {
@@ -313,8 +313,8 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
       if (!handle)
       {
-        HWND rootHWnd = GetAncestor( hWnd, GA_ROOT);
-        SendMessage(rootHWnd, WM_KEYDOWN, wParam, lParam);
+        HWND rootHWnd = GetAncestor( hWnd, GA_ROOTOWNER);
+        PostMessage(rootHWnd, WM_KEYDOWN, wParam, lParam);
         return DefWindowProc(hWnd, msg, wParam, lParam);
       }
       else
@@ -322,8 +322,8 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     }
     case WM_KEYUP:
     {
-      HWND rootHWnd = GetAncestor(hWnd, GA_ROOT);
-      SendMessage(rootHWnd, msg, wParam, lParam);
+      HWND rootHWnd = GetAncestor(hWnd, GA_ROOTOWNER);
+      PostMessage(rootHWnd, msg, wParam, lParam);
       return DefWindowProc(hWnd, msg, wParam, lParam);
     }
     case WM_PAINT:
