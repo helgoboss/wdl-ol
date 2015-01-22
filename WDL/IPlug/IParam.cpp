@@ -27,8 +27,8 @@ void IParam::InitBool(const char* name, bool defaultVal, const char* label, cons
   
   InitEnum(name, (defaultVal ? 1 : 0), 2, label, group);
 
-  SetDisplayText(0, "off");
-  SetDisplayText(1, "on");
+  SetDisplayText(0, "Off");
+  SetDisplayText(1, "On");
 }
 
 void IParam::InitEnum(const char* name, int defaultVal, int nEnums, const char* label, const char* group)
