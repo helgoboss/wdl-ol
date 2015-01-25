@@ -308,7 +308,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         POINT p;
         GetCursorPos(&p);
         ScreenToClient(hWnd, &p);
-        handle = pGraphics->OnKeyDown(p.x, p.y, key);
+        handle = pGraphics->OnKeyDown(p.x, p.y, wParam);
       }
 
       if (!handle)
