@@ -353,7 +353,7 @@ pascal OSStatus IGraphicsCarbon::MainEventHandler(EventHandlerCallRef pHandlerCa
           else handle = false;
 
           if(handle)
-            handle = pGraphicsMac->OnKeyDown(_this->mPrevX, _this->mPrevY, key);
+            handle = pGraphicsMac->OnKeyDown(_this->mPrevX, _this->mPrevY, key, 0);
 
           if(handle)
             return noErr;

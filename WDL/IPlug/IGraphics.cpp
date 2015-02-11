@@ -979,17 +979,17 @@ void IGraphics::ReleaseMouseCapture()
   mMouseCapture = mMouseX = mMouseY = -1;
 }
 
-bool IGraphics::OnKeyDown(int x, int y, int key)
+bool IGraphics::OnKeyDown(int x, int y, int key, int flags)
 {
   int c = GetMouseControlIdx(x, y);
 	if (c > 0) {
-		bool processedKey = mControls.Get(c)->OnKeyDown(x, y, key);
+		bool processedKey = mControls.Get(c)->OnKeyDown(x, y, key, flags);
 		if (!processedKey && mKeyCatcher) {
-			return mKeyCatcher->OnKeyDown(x, y, key);
+			return mKeyCatcher->OnKeyDown(x, y, key, flags);
 		}
 	} 
 	else if (mKeyCatcher)
-    return mKeyCatcher->OnKeyDown(x, y, key);
+		return mKeyCatcher->OnKeyDown(x, y, key, flags);
   else
     return false;
 }

@@ -437,27 +437,11 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
 
   if ([s length] == 1)
   {
-    unsigned short k = [pEvent keyCode];
-    unichar c = [s characterAtIndex:0];
-
-    bool handle = true;
-    int key;
-
-    if (k == 49) key = KEY_SPACE;
-    else if (k == 126) key = KEY_UPARROW;
-    else if (k == 125) key = KEY_DOWNARROW;
-    else if (k == 123) key = KEY_LEFTARROW;
-    else if (k == 124) key = KEY_RIGHTARROW;
-    else if (c >= '0' && c <= '9') key = KEY_DIGIT_0+c-'0';
-    else if (c >= 'A' && c <= 'Z') key = KEY_ALPHA_A+c-'A';
-    else if (c >= 'a' && c <= 'z') key = KEY_ALPHA_A+c-'a';
-    else handle = false;
-
-    if (handle)
-    {
-      // can't use getMouseXY because its a key event
-      handle = mGraphics->OnKeyDown(mPrevX, mPrevY, key);
-    }
+    int flags;
+    int key = SWELL_MacKeyToWindowsKey(pEvent, &flags);
+    
+    // can't use getMouseXY because its a key event
+    bool handle = mGraphics->OnKeyDown(mPrevX, mPrevY, key, flags);
 
     if (!handle)
     {

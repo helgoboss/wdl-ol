@@ -183,7 +183,7 @@ public:
   // (meaning the OS should capture the mouse).
   bool OnMouseDblClick(int x, int y, IMouseMod* pMod);
   void OnMouseWheel(int x, int y, IMouseMod* pMod, int d);
-  bool OnKeyDown(int x, int y, int key);
+  bool OnKeyDown(int x, int y, int key, int flags);
 
   virtual void HideMouseCursor() {};
   virtual void ShowMouseCursor() {};
