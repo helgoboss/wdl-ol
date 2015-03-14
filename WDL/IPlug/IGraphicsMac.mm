@@ -340,7 +340,7 @@ void* IGraphicsMac::OpenCocoaWindow(void* pParentView)
   CloseWindow();
   mGraphicsCocoa = (IGRAPHICS_COCOA*) [[IGRAPHICS_COCOA alloc] initWithIGraphics: this];
   
-  if (pParentView) // Cocoa VST host.
+  if (mPlug->windowWantsParent() && pParentView) // Cocoa VST host.
   {
     [(NSView*) pParentView addSubview: (IGRAPHICS_COCOA*) mGraphicsCocoa];
   }

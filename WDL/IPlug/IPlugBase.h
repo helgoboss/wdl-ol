@@ -101,8 +101,9 @@ public:
 
   virtual void PopupHostContextMenuForParam(int param, int x, int y) { return; }; //only for VST3, call it from the GUI
 
-	// implement this to create your own window instead of the default one when OpenWindow() is called
-	virtual void* createWindow(void* parentWindow) { return NULL; };
+	// you can return false here if you don't want the created window to be attached to a parent
+	// (for example if you want to dock it in REAPER after creation)
+	virtual bool windowWantsParent() { return true; };
 
   // ----------------------------------------
   // Your plugin class, or a control class, can call these functions.

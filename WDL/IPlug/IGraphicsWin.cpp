@@ -653,10 +653,13 @@ void* IGraphicsWin::OpenWindow(void* pParentWnd)
   }
 
   sFPS = FPS();
-	mPlugWnd = (HWND)mPlug->createWindow(pParentWnd);
-	if (!mPlugWnd) {
+	if (mPlug->windowWantsParent()) {
 		mPlugWnd = CreateWindow(wndClassName, "IPlug", WS_CHILD | WS_VISIBLE, // | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 			x, y, w, h, (HWND)pParentWnd, 0, mHInstance, this);
+	}
+	else {
+		mPlugWnd = CreateWindow(wndClassName, "IPlug", 0, // | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+			x, y, w, h, NULL, 0, mHInstance, this);
 	}
   //SetWindowLong(mPlugWnd, GWL_USERDATA, (LPARAM) this);
 
