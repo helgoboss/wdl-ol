@@ -714,6 +714,7 @@ bool IGraphics::IsDirty(IRECT* pR)
   }
 
 #ifdef USE_IDLE_CALLS
+	mPlug->OnGUIIdle();
   if (dirty)
   {
     mIdleTicks = 0;

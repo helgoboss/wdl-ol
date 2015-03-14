@@ -66,6 +66,11 @@ public:
   // Only active if USE_IDLE_CALLS is defined.
   virtual void OnIdle() {}
 
+	// This is an idle call from the window thread. It is called very frequently. There's
+	// no throttle as in IControl.OnGuiIdle(). Use it for plugin-wide (vs. control-wide) GUI updates in case
+	// OnIdle() (which is called by the host) is no option.
+	virtual void OnGUIIdle() {}
+
   // Not usually needed ... Reset is called on activate regardless of whether this is implemented.
   // Also different hosts have different interpretations of "activate".
   // Implementations should set a mutex lock like in the no-op!
