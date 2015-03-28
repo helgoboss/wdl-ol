@@ -187,6 +187,10 @@ protected:
   const WDL_String* GetInputBusLabel(int idx) { return mInputBusLabels.Get(idx); }
   const WDL_String* GetOutputBusLabel(int idx) { return mOutputBusLabels.Get(idx); }
 
+	void AddParam();
+	void InsertParam(int idx);
+	void RemoveParam(int idx);
+
   struct ChannelIO
   {
     int mIn, mOut;

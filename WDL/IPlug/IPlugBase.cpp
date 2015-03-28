@@ -1070,6 +1070,21 @@ void IPlugBase::SetOutputBusLabel(int idx, const char* pLabel)
   }
 }
 
+void IPlugBase::AddParam()
+{
+	mParams.Add(new IParam);
+}
+
+void IPlugBase::InsertParam(int idx)
+{
+	mParams.Insert(idx, new IParam);
+}
+
+void IPlugBase::RemoveParam(int idx)
+{
+	mParams.Delete(idx, true);
+}
+
 const int kFXPVersionNum = 1;
 const int kFXBVersionNum = 2;
 
