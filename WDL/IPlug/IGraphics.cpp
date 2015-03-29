@@ -199,6 +199,7 @@ void IGraphics::Resize(int w, int h)
   mWidth = w;
   mHeight = h;
   ReleaseMouseCapture();
+	mMouseOver = -1;
   mControls.Empty(true);
   DELETE_NULL(mDrawBitmap);
   DELETE_NULL(mTmpBitmap);
