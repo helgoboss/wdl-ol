@@ -454,11 +454,9 @@ bool IGraphicsMac::WindowIsOpen()
   #endif
 }
 
-void IGraphicsMac::Resize(int w, int h)
+WDL_PtrList<IControl> IGraphicsMac::Resize(int w, int h, bool deleteControls)
 {
-  if (w == Width() && h == Height()) return;
-
-  IGraphics::Resize(w, h);
+  WDL_PtrList<IControl> oldControls = IGraphics::Resize(w, h);
 
   #ifndef IPLUG_NO_CARBON_SUPPORT
   if (mGraphicsCarbon)
@@ -472,6 +470,7 @@ void IGraphicsMac::Resize(int w, int h)
     NSSize size = { static_cast<CGFloat>(w), static_cast<CGFloat>(h) };
     [(IGRAPHICS_COCOA*) mGraphicsCocoa setFrameSize: size ];
   }
+  return oldControls;
 }
 
 void IGraphicsMac::HideMouseCursor()

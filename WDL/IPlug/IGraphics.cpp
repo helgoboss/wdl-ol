@@ -194,17 +194,26 @@ IGraphics::~IGraphics()
   DELETE_NULL(mTmpBitmap);
 }
 
-void IGraphics::Resize(int w, int h)
+WDL_PtrList<IControl> IGraphics::Resize(int w, int h, bool deleteControls)
 {
   mWidth = w;
   mHeight = h;
   ReleaseMouseCapture();
 	mMouseOver = -1;
-  mControls.Empty(true);
+	WDL_PtrList<IControl> copiedControls = mControls;
+	mControls.Empty(deleteControls);
   DELETE_NULL(mDrawBitmap);
   DELETE_NULL(mTmpBitmap);
   PrepDraw();
   mPlug->ResizeGraphics(w, h);
+	if (deleteControls) {
+		// Return empty list
+		return WDL_PtrList<IControl>();
+	}
+	else {
+		// Return controls to be deleted by caller
+		return copiedControls;
+	}
 }
 
 void IGraphics::SetFromStringAfterPrompt(IControl* pControl, IParam* pParam, char *txt)

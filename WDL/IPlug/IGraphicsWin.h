@@ -17,7 +17,7 @@ public:
 
   void ForceEndUserEdit();
 
-  void Resize(int w, int h);
+	WDL_PtrList<IControl> Resize(int w, int h, bool deleteControls);
 
   void HideMouseCursor();
   void ShowMouseCursor();

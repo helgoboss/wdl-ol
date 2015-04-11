@@ -543,12 +543,10 @@ void IGraphicsWin::ForceEndUserEdit()
 
 #define SETPOS_FLAGS SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE
 
-void IGraphicsWin::Resize(int w, int h)
+WDL_PtrList<IControl> IGraphicsWin::Resize(int w, int h, bool deleteControls)
 {
-  // if (w == Width() && h == Height()) return;
-
   int dw = w - Width(), dh = h - Height();
-  IGraphics::Resize(w, h);
+  WDL_PtrList<IControl> oldControls = IGraphics::Resize(w, h);
 
   if (WindowIsOpen())
   {
@@ -587,6 +585,7 @@ void IGraphicsWin::Resize(int w, int h)
     RECT r = { 0, 0, Width(), Height() };
     InvalidateRect(mPlugWnd, &r, FALSE);
   }
+	return oldControls;
 }
 
 void IGraphicsWin::HideMouseCursor()

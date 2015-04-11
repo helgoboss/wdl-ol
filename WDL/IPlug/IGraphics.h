@@ -80,7 +80,10 @@ public:
   // Methods for the OS implementation class.
 
   virtual void ForceEndUserEdit() = 0;
-  virtual void Resize(int w, int h);
+
+	// If deleteControls is false, it doesn't destroy the existing controls but returns them
+	// so the caller can take care of destroying them later.
+	virtual WDL_PtrList<IControl> Resize(int w, int h, bool deleteControls = true);
   virtual bool WindowIsOpen() { return (GetWindow()); }
   virtual const char* GetGUIAPI() { return ""; };
 
