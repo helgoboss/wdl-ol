@@ -1229,13 +1229,16 @@ void IGraphicsWin::SetTooltip(const char* tooltip)
 
 void IGraphicsWin::ShowTooltip()
 {
-  const char* tooltip = GetControl(mTooltipIdx)->GetTooltip();
-  if (tooltip)
-  {
-    assert(strlen(tooltip) < 80);
-    SetTooltip(tooltip);
-    mShowingTooltip = true;
-  }
+	IControl* control = GetControl(mTooltipIdx);
+	if (control) {
+		const char* tooltip = control->GetTooltip();
+		if (tooltip)
+		{
+			assert(strlen(tooltip) < 80);
+			SetTooltip(tooltip);
+			mShowingTooltip = true;
+		}
+	}
 }
 
 void IGraphicsWin::HideTooltip()
