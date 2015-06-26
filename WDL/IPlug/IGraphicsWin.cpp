@@ -442,7 +442,9 @@ LRESULT CALLBACK IGraphicsWin::ParamEditProc(HWND hWnd, UINT msg, WPARAM wParam,
       }
       case WM_KILLFOCUS:
       {
-        pGraphics->mParamEditMsg = kCancel; // when another window is focussed, kill the text edit box
+				if (pGraphics->mParamEditMsg != kCommit) { // only if not something else has decided that it's going to be committed
+					pGraphics->mParamEditMsg = kCancel; // when another window is focussed, kill the text edit box
+				}
         break;
       }
       // handle WM_GETDLGCODE so that we can say that we want the return key message
@@ -1248,4 +1250,12 @@ void IGraphicsWin::HideTooltip()
     SetTooltip(NULL);
     mShowingTooltip = false;
   }
+}
+
+void IGraphicsWin::SetParamEditMsg(int paramEditMsg) {
+	mParamEditMsg = paramEditMsg;
+}
+
+HWND IGraphicsWin::GetParamEditWnd() {
+	return mParamEditWnd;
 }

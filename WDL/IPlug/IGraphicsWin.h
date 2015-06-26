@@ -56,6 +56,10 @@ public:
   void SetWindowTitle(char* str);
 
   const char* GetGUIAPI() { return "Windows GDI"; };
+
+	// Sometimes it can be useful to set the param edit result from outside
+	void SetParamEditMsg(int paramEditMsg);
+	HWND GetParamEditWnd();
   
 protected:
   LICE_IBitmap* OSLoadBitmap(int ID, const char* name);
