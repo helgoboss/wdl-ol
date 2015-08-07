@@ -4,7 +4,7 @@
 #include "Containers.h"
 #include <math.h>
 
-#define MAX_PARAM_NAME_LEN 32 // e.g. "Gain"
+#define MAX_PARAM_NAME_LEN 64 // e.g. "Gain"
 #define MAX_PARAM_LABEL_LEN 32 // e.g. "Percent"
 #define MAX_PARAM_DISPLAY_LEN 32 // e.g. "100" / "Mute"
 #define MAX_PARAM_DISPLAY_PRECISION 6
