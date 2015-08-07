@@ -710,6 +710,10 @@ bool IGraphics::DrawRadialLine(const IColor* pColor, float cx, float cy, float a
 
 bool IGraphics::IsDirty(IRECT* pR)
 {
+#ifdef USE_IDLE_CALLS
+	mPlug->OnGUIIdle();
+#endif
+
   bool dirty = false;
   int i, n = mControls.GetSize();
   IControl** ppControl = mControls.GetList();
@@ -724,16 +728,15 @@ bool IGraphics::IsDirty(IRECT* pR)
   }
 
 #ifdef USE_IDLE_CALLS
-	mPlug->OnGUIIdle();
-  if (dirty)
-  {
-    mIdleTicks = 0;
-  }
-  else if (++mIdleTicks > IDLE_TICKS)
-  {
-    OnGUIIdle();
-    mIdleTicks = 0;
-  }
+	if (dirty)
+	{
+		mIdleTicks = 0;
+	}
+	else if (++mIdleTicks > IDLE_TICKS)
+	{
+		OnGUIIdle();
+		mIdleTicks = 0;
+	}
 #endif
 
   return dirty;
