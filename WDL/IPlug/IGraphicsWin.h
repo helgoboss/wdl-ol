@@ -21,7 +21,8 @@ public:
 
   void HideMouseCursor();
   void ShowMouseCursor();
-  int ShowMessageBox(const char* pText, const char* pCaption, int type);
+	int ShowMessageBox(const char* pText, const char* pCaption, int type);
+	int ShowMessageBox(HWND parentWindow, const char* pText, const char* pCaption, int type);
 
   bool DrawScreen(IRECT* pR);
 

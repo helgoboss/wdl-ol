@@ -617,7 +617,12 @@ void IGraphicsWin::ShowMouseCursor()
 
 int IGraphicsWin::ShowMessageBox(const char* pText, const char* pCaption, int type)
 {
-  return MessageBox(GetMainWnd(), pText, pCaption, type);
+  return ShowMessageBox(GetMainWnd(), pText, pCaption, type);
+}
+
+int IGraphicsWin::ShowMessageBox(HWND parentWindow, const char* pText, const char* pCaption, int type)
+{
+	return MessageBox(parentWindow, pText, pCaption, type);
 }
 
 bool IGraphicsWin::DrawScreen(IRECT* pR)
