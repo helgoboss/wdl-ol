@@ -548,7 +548,7 @@ void IGraphicsWin::ForceEndUserEdit()
 WDL_PtrList<IControl> IGraphicsWin::Resize(int w, int h, bool deleteControls)
 {
   int dw = w - Width(), dh = h - Height();
-  WDL_PtrList<IControl> oldControls = IGraphics::Resize(w, h);
+  WDL_PtrList<IControl> oldControls = IGraphics::Resize(w, h, deleteControls);
 
   if (WindowIsOpen())
   {

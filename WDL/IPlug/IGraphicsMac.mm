@@ -456,7 +456,7 @@ bool IGraphicsMac::WindowIsOpen()
 
 WDL_PtrList<IControl> IGraphicsMac::Resize(int w, int h, bool deleteControls)
 {
-  WDL_PtrList<IControl> oldControls = IGraphics::Resize(w, h);
+  WDL_PtrList<IControl> oldControls = IGraphics::Resize(w, h, deleteControls);
 
   #ifndef IPLUG_NO_CARBON_SUPPORT
   if (mGraphicsCarbon)
