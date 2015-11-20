@@ -910,20 +910,26 @@ bool IPlugBase::SerializeParams(ByteChunk* pChunk)
 
 int IPlugBase::UnserializeParams(ByteChunk* pChunk, int startPos)
 {
-  TRACE;
+	return UnserializeParamsIncreasingIndex(pChunk, startPos, 0, 0);
+}
 
-  WDL_MutexLock lock(&mMutex);
-  int i, n = mParams.GetSize(), pos = startPos;
-  for (i = 0; i < n && pos >= 0; ++i)
-  {
-    IParam* pParam = mParams.Get(i);
-    double v = 0.0;
-    Trace(TRACELOC, "%d %s %f", i, pParam->GetNameForHost(), pParam->Value());
-    pos = pChunk->Get(&v, pos);
-    pParam->Set(v);
-  }
-  OnParamReset();
-  return pos;
+int IPlugBase::UnserializeParamsIncreasingIndex(ByteChunk* pChunk, int startPos, int increaseFromIndex, int increaseBy)
+{
+	TRACE;
+
+	WDL_MutexLock lock(&mMutex);
+	int i, n = mParams.GetSize() - increaseBy, pos = startPos;
+	for (i = 0; i < n && pos >= 0; ++i)
+	{
+		int actualParamIndex = i < increaseFromIndex ? i : i + increaseBy;
+		IParam* pParam = mParams.Get(actualParamIndex);
+		double v = 0.0;
+		Trace(TRACELOC, "%d %s %f", actualParamIndex, pParam->GetNameForHost(), pParam->Value());
+		pos = pChunk->Get(&v, pos);
+		pParam->Set(v);
+	}
+	OnParamReset();
+	return pos;
 }
 
 bool IPlugBase::CompareState(const unsigned char* incomingState, int startPos)

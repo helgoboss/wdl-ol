@@ -241,6 +241,11 @@ protected:
   bool SerializeParams(ByteChunk* pChunk);
   int UnserializeParams(ByteChunk* pChunk, int startPos); // Returns the new chunk position (endPos)
 
+	// This method can be useful for preset migration if some new parameters have been inserted somewhere.
+	// Adds increaseBy to all param indexes >= increaseFromIndex before applying the saved parameter value.
+	// Besides that it behaves like the other UnserializeParams method.
+	int UnserializeParamsIncreasingIndex(ByteChunk* pChunk, int startPos, int increaseFromIndex, int increaseBy);
+
   #ifndef OS_IOS
   virtual void RedrawParamControls();  // Called after restoring state.
   #endif
