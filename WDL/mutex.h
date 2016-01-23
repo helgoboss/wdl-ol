@@ -54,14 +54,19 @@
 #endif
 
 #include "wdltypes.h"
+#include <queue>
+#include <functional>
+#include <thread>
+
+using std::queue;
+using std::function;
+using std::thread;
 
 class WDL_Mutex {
   public:
     WDL_Mutex() 
     {
-#ifdef _DEBUG
-      _debug_cnt=0;
-#endif
+      _cnt=0;
 
 #ifdef _WIN32
       InitializeCriticalSection(&m_cs);
@@ -91,10 +96,6 @@ class WDL_Mutex {
 
     void Enter()
     {
-#ifdef _DEBUG
-      _debug_cnt++;
-#endif
-
 #ifdef _WIN32
       EnterCriticalSection(&m_cs);
 #elif defined(WDL_MAC_USE_CARBON_CRITSEC)
@@ -102,13 +103,25 @@ class WDL_Mutex {
 #else
       pthread_mutex_lock(&m_mutex);
 #endif
+
+      _cnt++;
+      m_mutex_owner = std::this_thread::get_id();
     }
 
     void Leave()
     {
-#ifdef _DEBUG
-      _debug_cnt--;
-#endif
+      _cnt--;
+      bool lockReleased = _cnt == 0;
+      queue<function<void(void)>> oldQueue;
+
+      if (lockReleased) {
+        // Remove owner info
+        m_mutex_owner = thread::id();
+
+        // Clear queue but save its commands within this method
+        oldQueue = m_release_command_queue;
+        m_release_command_queue = queue<function<void(void)>>();
+      }
 
 #ifdef _WIN32
       LeaveCriticalSection(&m_cs);
@@ -117,13 +130,32 @@ class WDL_Mutex {
 #else
       pthread_mutex_unlock(&m_mutex);
 #endif
+
+      // Execute commands if lock now released
+      if (lockReleased) {
+        while (!oldQueue.empty()) {
+          auto command = oldQueue.front();
+          oldQueue.pop();
+          command();
+        }
+      }
     }
 
-#ifdef _DEBUG
-  int _debug_cnt;
-#endif
+  void ExecuteWhenUnlocked(function<void(void)> command) {
+    if (std::this_thread::get_id() == m_mutex_owner) {
+      // Current thread holds lock. Schedule command for execution right after it has released the lock.
+      m_release_command_queue.push(command);
+    } else {
+      // There's no lock currently or another thread holds the lock. Execute right away.
+      command();
+    }
+  }
+
+  int _cnt;
 
   private:
+    thread::id m_mutex_owner;
+  queue<function<void(void)>> m_release_command_queue;
 #ifdef _WIN32
   CRITICAL_SECTION m_cs;
 #elif defined(WDL_MAC_USE_CARBON_CRITSEC)
