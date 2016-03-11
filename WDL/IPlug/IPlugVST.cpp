@@ -398,6 +398,26 @@ VstIntPtr VSTCALLBACK IPlugVST::VSTDispatcher(AEffect *pEffect, VstInt32 opCode,
 //      }
 //      return 1;
 //    }
+    case effGetParameterProperties:
+    {
+      if (idx >= 0 && idx < _this->NParams())
+      {
+        VstParameterProperties* props = (VstParameterProperties*) ptr;
+        props->flags = 0;
+        IParam* pParam = _this->GetParam(idx);
+        if (pParam->Type() == IParam::kTypeBool) {
+          props->flags |= kVstParameterIsSwitch;
+        }
+        if (pParam->Type() == IParam::kTypeEnum || pParam->Type() == IParam::kTypeInt) {
+          props->flags |= kVstParameterUsesFloatStep;
+          int possibleValuesCount = (int) (pParam->GetMax() - pParam->GetMin());
+          props->stepFloat = 1.0 / possibleValuesCount;
+          props->smallStepFloat = props->stepFloat;
+          props->largeStepFloat = props->stepFloat;
+        }
+      }
+      return 1;
+    }
     case effString2Parameter:
     {
       if (idx >= 0 && idx < _this->NParams())
