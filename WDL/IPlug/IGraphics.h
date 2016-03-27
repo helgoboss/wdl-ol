@@ -5,9 +5,6 @@
 #include "IPopupMenu.h"
 #include "IControl.h"
 #include "../lice/lice.h"
-#include <functional>
-
-using std::function;
 
 // Specialty stuff for calling in to Reaper for Lice functionality.
 #ifdef REAPER_SPECIAL
@@ -242,9 +239,6 @@ public:
   LICE_pixel* GetBits();
   // For controls that need to interface directly with LICE.
   inline LICE_SysBitmap* GetDrawBitmap() const { return mDrawBitmap; }
-
-  // Hook to receive and process messages (for GUIs that use native Windows controls)
-  function<LRESULT CALLBACK(HWND, UINT, WPARAM, LPARAM)> customWindowProc = nullptr;
 
   WDL_Mutex mMutex;
 

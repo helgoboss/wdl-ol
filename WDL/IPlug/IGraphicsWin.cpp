@@ -79,10 +79,6 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     return DefWindowProc(hWnd, msg, wParam, lParam);
   }
 
-  if (pGraphics->customWindowProc != nullptr) {
-    pGraphics->customWindowProc(hWnd, msg, wParam, lParam);
-  }
-
   switch (msg)
   {
 
