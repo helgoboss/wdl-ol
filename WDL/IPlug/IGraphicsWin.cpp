@@ -313,13 +313,16 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     }
     case WM_PAINT:
     {
-      RECT r;
-      if (GetUpdateRect(hWnd, &r, FALSE))
-      {
-        IRECT ir(r.left, r.top, r.right, r.bottom);
-        pGraphics->Draw(&ir);
+      if (pGraphics->mControls.GetSize() > 0) {
+        RECT r;
+        if (GetUpdateRect(hWnd, &r, FALSE)) {
+          IRECT ir(r.left, r.top, r.right, r.bottom);
+          pGraphics->Draw(&ir);
+        }
+        return 0;
+      } else {
+        break;
       }
-      return 0;
     }
 
     case WM_CTLCOLOREDIT:
