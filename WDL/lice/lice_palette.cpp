@@ -2,6 +2,11 @@
 #include "../ptrlist.h"
 #include "../wdltypes.h"
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 
 #define OCTREE_DEPTH 5  // every depth level adds 3 bits of RGB colorspace (depth 8 => 24-bit RGB)
 

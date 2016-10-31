@@ -7,6 +7,11 @@
 
 #include "../mutex.h"
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 HWND g_swell_only_timerhwnd;
 
 @implementation SWELL_TimerFuncTarget
@@ -283,7 +288,7 @@ UINT_PTR SetTimer(HWND hwnd, UINT_PTR timerid, UINT rate, TIMERPROC tProc)
     if (!hwnd) timerid = rec->timerid = (UINT_PTR)rec;
     
     SWELL_TimerFuncTarget *t = [[SWELL_TimerFuncTarget alloc] initWithId:timerid hwnd:hwnd callback:tProc];
-    rec->timer = [NSTimer scheduledTimerWithTimeInterval:(max(rate,1)*0.001) target:t selector:@selector(SWELL_Timer:) 
+    rec->timer = [NSTimer scheduledTimerWithTimeInterval:(max(rate,1)*0.001) target:t selector:@selector(SWELL_Timer:)
                                                 userInfo:t repeats:YES];
     [t release];
     

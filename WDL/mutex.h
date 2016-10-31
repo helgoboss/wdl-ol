@@ -59,11 +59,6 @@
 #include <functional>
 #include <thread>
 
-// After including all the std stuff, I need to redefine min and max which was
-// initially done in "wdltypes.h".
-#define max(x,y) ((x)<(y)?(y):(x))
-#define min(x,y) ((x)<(y)?(x):(y))
-
 using std::queue;
 using std::function;
 using std::thread;

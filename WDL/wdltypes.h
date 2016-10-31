@@ -79,12 +79,6 @@ typedef bool WDL_bool;
   #define WDL_STATICFUNC_UNUSED
 #endif
 
-
-#ifndef max
-#define max(x,y) ((x)<(y)?(y):(x))
-#define min(x,y) ((x)<(y)?(x):(y))
-#endif
-
 #ifndef _WIN32
   #ifndef strnicmp 
     #define strnicmp(x,y,z) strncasecmp(x,y,z)

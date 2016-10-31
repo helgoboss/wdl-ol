@@ -5,6 +5,11 @@
 #include <stdio.h>
 //#include <assert.h>
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 template <class T> inline void SWAP(T& a, T& b) { T tmp = a; a = b; b = tmp; }
 
 enum { eOK = 0, eXLo = 1, eXHi = 2, eYLo = 4, eYHi = 8 };

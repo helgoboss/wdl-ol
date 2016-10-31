@@ -9,6 +9,7 @@
 #define __LICE_BOUND(x,lo,hi) ((x)<(lo)?(lo):((x)>(hi)?(hi):(x)))
 
 #ifndef max
+#define MAX_AND_MIN_DEFINED
 #define max(x,y) ((x)<(y)?(y):(x))
 #define min(x,y) ((x)<(y)?(x):(y))
 #endif
@@ -816,5 +817,11 @@ public:
     }
      
 typedef void (*LICE_COMBINEFUNC)(LICE_pixel_chan *dest, int r, int g, int b, int a, int alpha);
-   
+
+#ifdef MAX_AND_MIN_DEFINED
+#undef max
+#undef min
+#undef MAX_AND_MIN_DEFINED
+#endif
+
 #endif // _LICE_COMBINE_H_

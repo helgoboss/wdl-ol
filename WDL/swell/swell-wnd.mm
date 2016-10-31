@@ -36,6 +36,11 @@
 #include "swell-dlggen.h"
 #include "swell-internal.h"
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 extern int SWELL_GetOSXVersion();
 
 static LRESULT sendSwellMessage(id obj, UINT uMsg, WPARAM wParam, LPARAM lParam)

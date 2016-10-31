@@ -16,6 +16,11 @@
 #include "lice_combine.h"
 #include "lice_extended.h"
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 #ifndef _WIN32
 #include "../swell/swell.h"
 #endif

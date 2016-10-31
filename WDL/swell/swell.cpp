@@ -50,6 +50,11 @@
 #include "../mutex.h"
 #include "../assocarray.h"
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 void Sleep(int ms)
 {
   usleep(ms?ms*1000:100);

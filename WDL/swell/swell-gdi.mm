@@ -44,6 +44,11 @@
 #include <OpenGL/gl.h>
 #endif
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 int SWELL_GetOSXVersion()
 {
   static SInt32 v;

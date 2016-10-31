@@ -2,6 +2,11 @@
 #include "lice_combine.h"
 #include <math.h>
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 #define _PI 3.141592653589793238f
 
 template <class T> inline void _SWAP(T& a, T& b) { T tmp = a; a = b; b = tmp; }
