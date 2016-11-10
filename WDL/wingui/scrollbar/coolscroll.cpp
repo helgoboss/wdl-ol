@@ -93,6 +93,11 @@
   #endif
 #endif
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
+
 #include "../../lice/lice.h"
 #include "../../ptrlist.h"
 
