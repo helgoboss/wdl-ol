@@ -221,6 +221,11 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   return self;
 }
 
+- (BOOL) isFlipped
+{
+  return true;
+}
+
 - (id) initWithIGraphics: (IGraphicsMac*) pGraphics
 {
   TRACE;
