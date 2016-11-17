@@ -223,7 +223,7 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
 
 - (BOOL) isFlipped
 {
-  return true;
+  return mGraphics ? mGraphics->UsesNativeControls() : false;
 }
 
 - (id) initWithIGraphics: (IGraphicsMac*) pGraphics

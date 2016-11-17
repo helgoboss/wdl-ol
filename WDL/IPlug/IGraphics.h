@@ -154,6 +154,8 @@ public:
   void AttachBackground(int ID, const char* name);
   void AttachPanelBackground(const IColor *pColor);
   void AttachKeyCatcher(IControl* pControl);
+  void SetUsesNativeControls(bool usesNativeControls);
+  bool UsesNativeControls();
 
   // Returns the control index of this control (not the number of controls).
   int AttachControl(IControl* pControl);
@@ -254,6 +256,7 @@ protected:
   IPlugBase* mPlug;
   IRECT mDrawRECT;
   bool mCursorHidden;
+  bool mUsesNativeControls;
   int mHiddenMousePointX, mHiddenMousePointY;
 
   bool CanHandleMouseOver() { return mHandleMouseOver; }

@@ -176,6 +176,7 @@ IGraphics::IGraphics(IPlugBase* pPlug, int w, int h, int refreshFPS)
   , mLastClickedParam(-1)
   , mKeyCatcher(0)
   , mCursorHidden(false)
+  , mUsesNativeControls(false)
   , mHiddenMousePointX(-1)
   , mHiddenMousePointY(-1)
   , mEnableTooltips(false)
@@ -246,6 +247,15 @@ void IGraphics::AttachBackground(int ID, const char* name)
   IBitmap bg = LoadIBitmap(ID, name);
   IControl* pBG = new IBitmapControl(mPlug, 0, 0, -1, &bg, IChannelBlend::kBlendClobber);
   mControls.Insert(0, pBG);
+}
+
+void IGraphics::SetUsesNativeControls(bool usesNativeControls)
+{
+  mUsesNativeControls = usesNativeControls;
+}
+bool IGraphics::UsesNativeControls()
+{
+  return mUsesNativeControls;
 }
 
 void IGraphics::AttachPanelBackground(const IColor *pColor)
