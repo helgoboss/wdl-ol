@@ -30,6 +30,10 @@
 
 #include "denormal.h"
 
+#ifndef max
+#define max(x,y) ((x)<(y)?(y):(x))
+#define min(x,y) ((x)<(y)?(x):(y))
+#endif
 
 char *projectcontext_fastDoubleToString(double value, char *bufOut, int prec_digits)
 {
