@@ -885,7 +885,9 @@ void VSTCALLBACK IPlugVST::VSTProcess(AEffect* pEffect, float** inputs, float** 
 {
   TRACE_PROCESS;
   IPlugVST* _this = (IPlugVST*) pEffect->object;
+#ifndef DISABLE_PROCESS_LOCKING
   IMutexLock lock(_this);
+#endif
   _this->VSTPrepProcess(inputs, outputs, nFrames);
   _this->ProcessBuffersAccumulating((float) 0.0f, nFrames);
 }
@@ -894,7 +896,9 @@ void VSTCALLBACK IPlugVST::VSTProcessReplacing(AEffect* pEffect, float** inputs,
 {
   TRACE_PROCESS;
   IPlugVST* _this = (IPlugVST*) pEffect->object;
+#ifndef DISABLE_PROCESS_LOCKING
   IMutexLock lock(_this);
+#endif
   _this->VSTPrepProcess(inputs, outputs, nFrames);
   _this->ProcessBuffers((float) 0.0f, nFrames);
 }
@@ -903,7 +907,9 @@ void VSTCALLBACK IPlugVST::VSTProcessDoubleReplacing(AEffect* pEffect, double** 
 {
   TRACE_PROCESS;
   IPlugVST* _this = (IPlugVST*) pEffect->object;
-  IMutexLock lock(_this);
+#ifndef DISABLE_PROCESS_LOCKING
+   IMutexLock lock(_this);
+#endif
   _this->VSTPrepProcess(inputs, outputs, nFrames);
   _this->ProcessBuffers((double) 0.0, nFrames);
 }
