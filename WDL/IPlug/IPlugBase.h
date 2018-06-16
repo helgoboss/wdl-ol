@@ -110,6 +110,7 @@ public:
 
   int NParams() { return mParams.GetSize(); }
   IParam* GetParam(int idx) { return mParams.Get(idx); }
+  virtual bool GetNamedConfigParam(const char* paramName, char* outputBuffer, int outputBufferSize) const { return false; }
   IGraphics* GetGUI() const { return mGraphics; }
 
   const char* GetEffectName() { return mEffectName; }

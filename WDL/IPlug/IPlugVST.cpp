@@ -790,6 +790,16 @@ VstIntPtr VSTCALLBACK IPlugVST::VSTDispatcher(AEffect *pEffect, VstInt32 opCode,
         }
       }
 
+      if (idx == 23)
+      {
+        if (value) {
+          const auto* paramName = (const char*) value;
+          if (_this->GetNamedConfigParam(paramName, (char*) ptr, static_cast<int>(opt))) {
+            return 0xbeef0000;
+          }
+        }
+      }
+
       return 0;
     }
     case effGetProgram:
