@@ -790,12 +790,12 @@ VstIntPtr VSTCALLBACK IPlugVST::VSTDispatcher(AEffect *pEffect, VstInt32 opCode,
         }
       }
 
-      if (idx == 23)
+      if (idx == effGetChunk)
       {
         if (value) {
           const auto* paramName = (const char*) value;
           if (_this->GetNamedConfigParam(paramName, (char*) ptr, static_cast<int>(opt))) {
-            return 0xbeef0000;
+            return 0xf00d;
           }
         }
       }
