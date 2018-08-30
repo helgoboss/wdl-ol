@@ -13,7 +13,7 @@ if (WDL_EEL2)
       eel2/nseel-yylex.c
       )
   add_library(wdl-eel2 ${EEL2_SOURCES})
-  target_include_directories(wdl-eel2 INTERFACE .)
+  target_include_directories(wdl-eel2 INTERFACE ${PROJECT_SOURCE_DIR})
   if (MSVC)
     if (NOT ${MSVC_C_ARCHITECTURE_ID} MATCHES X86)
       target_link_libraries(wdl-eel2 ${PROJECT_SOURCE_DIR}/eel2/asm-nseel-x64.obj)
